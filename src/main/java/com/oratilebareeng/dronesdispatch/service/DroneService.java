@@ -114,11 +114,21 @@ public class DroneService {
                         + "\nPlease charge drone before loading";
 
             } else if(drone.get().getLoadedMedication().contains(medication)) {
+                // ensure duplicate medication is not loaded
                 return medication.getName()
                         + " with code "
                         + medication.getCode()
                         + " is already loaded onto "
                         + serialNumber;
+            } else if(!drone.get().getState().equals(DroneState.IDLE)
+            && !drone.get().getState().equals(DroneState.LOADING)) {
+                // ensure only IDLE and LOADING state drones can load medication
+                return serialNumber
+                + " is currently "
+                        + drone.get().getState();
+            } else if(drone.get().getLoadedCapacity() == drone.get().getWeight()) {
+                // update drone is fully loaded
+                updateDrone(serialNumber,null , DroneState.LOADED);
             }
             else {
                 drone.get().loadMedication(medication);
