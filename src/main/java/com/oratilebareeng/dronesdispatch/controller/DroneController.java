@@ -114,6 +114,15 @@ public class DroneController {
         );
     }
 
-
+    // check drone battery level
+    @GetMapping(path = "/batteryLevel/{serialNumber}")
+    public ResponseEntity<String> getDroneBatteryLevel(
+            @PathVariable("serialNumber") String serialNumber
+    ){
+        return new ResponseEntity<>(
+                droneService.getDroneBatteryLevel(serialNumber),
+                HttpStatus.OK
+        );
+    }
 
 }

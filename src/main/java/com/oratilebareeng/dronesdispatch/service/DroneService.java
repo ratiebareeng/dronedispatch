@@ -152,4 +152,17 @@ public class DroneService {
         }
     }
 
+    // get drone battery level
+    public String getDroneBatteryLevel(String droneSerialNumber) {
+        // ensure drone exists
+        Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(droneSerialNumber);
+        if(databaseDrone.isPresent()) {
+            return databaseDrone.get().getSerialNumber()
+            + " battery level is: " + databaseDrone.get().getBatteryCapacity() + "%";
+        }else {
+            return "Drone with Serial Number: " + droneSerialNumber+"  does not exist";
+        }
+
+    }
+
 }
