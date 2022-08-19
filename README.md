@@ -8,7 +8,7 @@ delivery drones.
 This application is packaged as a jar, and you run it using the java -jar command.
 
 * Clone this repository
-* Make sure you are using JDK 1.8 and Maven 3.x
+* Make sure you are using JDK 1.8 or higher
 * Navigate to project root directory and build the project by running:
 `mvn clean package`
 * Once successfully built, you can run the service by: 
