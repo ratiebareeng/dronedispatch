@@ -1,18 +1,14 @@
 package com.oratilebareeng.dronesdispatch.service;
 
-import com.oratilebareeng.dronesdispatch.model.Drone;
-import com.oratilebareeng.dronesdispatch.model.DronePage;
-import com.oratilebareeng.dronesdispatch.model.DroneState;
-import com.oratilebareeng.dronesdispatch.model.Medication;
+import com.oratilebareeng.dronesdispatch.model.*;
 import com.oratilebareeng.dronesdispatch.repository.DroneRepository;
+import com.oratilebareeng.dronesdispatch.repository.MedicationRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -20,6 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class DroneService {
     private final DroneRepository droneRepository;
+    private final MedicationRepository medicationRepository;
 
     // list all drones
     public Page<Drone> getDrones(DronePage dronePage) {
@@ -122,6 +119,17 @@ public class DroneService {
             }
         }
         return serialNumber + " does not exist";
+    }
+
+    // get medication loaded onto drone
+    public List<Medication> getLoadedMedication(String droneSerialNumber){
+        // ensure drone exists
+        Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(droneSerialNumber);
+        if(databaseDrone.isPresent()) {
+            return databaseDrone.get().getLoadedMedication();
+        } else {
+            throw new IllegalStateException("Drone with Serial Number: " + droneSerialNumber+"  does not exist");
+        }
     }
 
 }

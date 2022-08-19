@@ -1,9 +1,6 @@
 package com.oratilebareeng.dronesdispatch.controller;
 
-import com.oratilebareeng.dronesdispatch.model.Drone;
-import com.oratilebareeng.dronesdispatch.model.DronePage;
-import com.oratilebareeng.dronesdispatch.model.DroneState;
-import com.oratilebareeng.dronesdispatch.model.Medication;
+import com.oratilebareeng.dronesdispatch.model.*;
 import com.oratilebareeng.dronesdispatch.service.DroneService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -13,6 +10,8 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/v1/drones-dispatch")
@@ -24,6 +23,15 @@ public class DroneController {
    public ResponseEntity<Page<Drone>> getDrones(DronePage dronePage){
        return new ResponseEntity<>(
                droneService.getDrones(dronePage),
+               HttpStatus.OK
+       );
+   }
+
+   // get loaded medication for drone
+   @GetMapping(path = "/loadedMedication/{serialNumber}")
+   public ResponseEntity<List<Medication>> getLoadedMedication(@PathVariable String serialNumber){
+       return new ResponseEntity<>(
+               droneService.getLoadedMedication(serialNumber),
                HttpStatus.OK
        );
    }
@@ -87,7 +95,6 @@ public class DroneController {
     }
 
     // load drone with medication
-    // load medication
     @PostMapping("/loadDrone/{serialNumber}")
     public ResponseEntity<String> loadDroneWithMedication(
             @PathVariable("serialNumber") String serialNumber,
