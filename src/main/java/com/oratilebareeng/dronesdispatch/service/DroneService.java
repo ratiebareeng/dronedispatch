@@ -62,5 +62,36 @@ public class DroneService {
         }
     }
 
+    // update drone
+    @Transactional
+    public void updateDrone(String serialNumber,
+                            Integer batteryCapacity, String droneState){
+        // check if student exists
+        Drone databaseDrone = droneRepository.findBySerialNumber(serialNumber)
+                .orElseThrow(()-> new IllegalStateException("Drone with Serial Number: "
+                        + serialNumber + " does not exist"));
+
+        if(batteryCapacity == null && (droneState == null || droneState.isEmpty())){
+            throw new IllegalStateException("Please provide new details to update " + serialNumber);
+        }
+
+        // validate battery capacity is within allowed range 0-100
+        // and is not the same as student name in db
+        if(batteryCapacity != null && batteryCapacity != databaseDrone.getBatteryCapacity()){
+            if(batteryCapacity < 0 || batteryCapacity > 100) {
+                throw new IllegalStateException("Battery capacity must be between 0 and 100");
+            }
+            databaseDrone.setBatteryCapacity(batteryCapacity);
+        }
+
+
+        // vaidate drone state not null, not empty, not same
+        if(droneState != null && !droneState.isEmpty()
+                && !Objects.equals(droneState, databaseDrone.getState())
+        ){
+                databaseDrone.setState(DroneState.valueOf(droneState.toUpperCase()));
+            System.out.println(droneState);
+        }
+    }
 
 }

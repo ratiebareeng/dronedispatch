@@ -50,18 +50,38 @@ public class DroneController {
         try {
             Drone deletedDrone = droneService.deleteDrone(serialNumber);
             return new ResponseEntity<>(
-                    "Drone: " + serialNumber + " has been deleted",
+                    serialNumber + " has been deleted",
                     HttpStatus.OK
             );
         } catch (IllegalStateException e){
             return new ResponseEntity<>(
-                    "Drone: " + serialNumber
+                    serialNumber
                             + " not deleted. " + e.getMessage(),
                     HttpStatus.BAD_REQUEST
             );
         }
     }
 
+    // update drone
+    @PutMapping(path = "updateDrone/{serialNumber}")
+    public ResponseEntity<String> updateDrone(
+            @PathVariable("serialNumber") String serialNumber,
+            @RequestParam(required = false) Integer batteryCapacity,
+            @RequestParam(required = false) String droneState){
+        try {
+            droneService.updateDrone(serialNumber, batteryCapacity, droneState);
+            return new ResponseEntity<>(
+                    serialNumber + " updated.",
+                    HttpStatus.OK
+            );
+        } catch (IllegalStateException e){
+            return new ResponseEntity<>(
+                    serialNumber
+                            + " not updated. " + e.getMessage(),
+                    HttpStatus.BAD_REQUEST
+            );
+        }
 
+    }
 
 }
