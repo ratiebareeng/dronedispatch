@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 public class DroneService {
     private final DroneRepository droneRepository;
     private Logger logger = LoggerFactory.getLogger(DroneService.class);
+    final int minimumLoadBatteryCapacity = 25;
 
     // list all drones
     public Page<Drone> getDrones(DronePage dronePage) {
@@ -103,8 +104,8 @@ public class DroneService {
             // prevent load drone if medication weight is more than available capacity
             if (!(availableSpace >= medication.getWeight())) {
                return  "Not enough space in drone. Available space: " + availableSpace + "g";
-            } else if (drone.get().getBatteryCapacity() < 25){ // todo: save
-                // prevent load drone if battery capacity is below 25%
+            } else if (drone.get().getBatteryCapacity() < minimumLoadBatteryCapacity){
+                // prevent load drone if battery capacity is below minimumLoadBatteryCapacity
                 return "Medication not loaded. "
                         + serialNumber
                         + " battery level: "
@@ -112,9 +113,14 @@ public class DroneService {
                         + " is below 25%"
                         + "\nPlease charge drone before loading";
 
+            } else if(drone.get().getLoadedMedication().contains(medication)) {
+                return medication.getName()
+                        + " with code "
+                        + medication.getCode()
+                        + " is already loaded onto "
+                        + serialNumber;
             }
             else {
-
                 drone.get().loadMedication(medication);
                 // update drone state
                 updateDrone(serialNumber, null, DroneState.LOADING);
