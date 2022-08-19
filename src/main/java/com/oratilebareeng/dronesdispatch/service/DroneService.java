@@ -3,6 +3,7 @@ package com.oratilebareeng.dronesdispatch.service;
 import com.oratilebareeng.dronesdispatch.model.Drone;
 import com.oratilebareeng.dronesdispatch.model.DronePage;
 import com.oratilebareeng.dronesdispatch.model.DroneState;
+import com.oratilebareeng.dronesdispatch.model.Medication;
 import com.oratilebareeng.dronesdispatch.repository.DroneRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -90,8 +91,37 @@ public class DroneService {
                 && !Objects.equals(droneState, databaseDrone.getState())
         ){
                 databaseDrone.setState(DroneState.valueOf(droneState.toUpperCase()));
-            System.out.println(droneState);
         }
+    }
+
+    // load drone with medication
+    public String loadDroneWithMedication(Medication medication, String serialNumber){
+        Optional<Drone> drone = droneRepository.findBySerialNumber(serialNumber);
+        if(drone.isPresent()) {
+            double availableSpace = drone.get().getWeight() - drone.get().getLoadedCapacity();
+            // prevent load drone if medication weight is more than available capacity
+            if (!(availableSpace >= medication.getWeight())) {
+               return  "Not enough space in drone. Available space: " + availableSpace + "g";
+            } else if (drone.get().getBatteryCapacity() < 25){ // todo: save
+                // prevent load drone if battery capacity is below 25%
+                return "Medication not loaded. "
+                        + serialNumber
+                        + " battery level: "
+                        + drone.get().getBatteryCapacity()
+                        + " is below 25%"
+                        + "\nPlease charge drone before loading";
+
+            }
+            else {
+
+                drone.get().loadMedication(medication);
+                // update drone state
+                updateDrone(serialNumber, null, DroneState.LOADING.name());
+                droneRepository.save(drone.get());
+                return medication.getName() + " has been loaded onto " + serialNumber;
+            }
+        }
+        return serialNumber + " does not exist";
     }
 
 }

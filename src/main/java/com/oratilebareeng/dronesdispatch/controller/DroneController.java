@@ -2,6 +2,7 @@ package com.oratilebareeng.dronesdispatch.controller;
 
 import com.oratilebareeng.dronesdispatch.model.Drone;
 import com.oratilebareeng.dronesdispatch.model.DronePage;
+import com.oratilebareeng.dronesdispatch.model.Medication;
 import com.oratilebareeng.dronesdispatch.service.DroneService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -81,7 +82,18 @@ public class DroneController {
                     HttpStatus.BAD_REQUEST
             );
         }
+    }
 
+    // load drone with medication
+    // load medication
+    @PostMapping("/loadDrone/{serialNumber}")
+    public ResponseEntity<String> loadDroneWithMedication(
+            @PathVariable("serialNumber") String serialNumber,
+            @RequestBody Medication medication) {
+        return new ResponseEntity<>(
+                droneService.loadDroneWithMedication(medication, serialNumber),
+                HttpStatus.OK
+        );
     }
 
 }
