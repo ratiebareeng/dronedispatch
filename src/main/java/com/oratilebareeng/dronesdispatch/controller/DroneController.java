@@ -105,4 +105,15 @@ public class DroneController {
         );
     }
 
+    // check available drones
+    @GetMapping(path = "/availableDrones")
+    public ResponseEntity<Page<Drone>> getAvailableDrones(DronePage dronePage){
+        return new ResponseEntity<>(
+                droneService.getAvailableDrones(dronePage),
+                HttpStatus.OK
+        );
+    }
+
+
+
 }

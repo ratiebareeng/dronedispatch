@@ -8,9 +8,11 @@ import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -129,6 +131,24 @@ public class DroneService {
             return databaseDrone.get().getLoadedMedication();
         } else {
             throw new IllegalStateException("Drone with Serial Number: " + droneSerialNumber+"  does not exist");
+        }
+    }
+
+    // check available drones for loading
+    public Page<Drone> getAvailableDrones(DronePage dronePage){
+        // configure sort
+        Sort dronesSort = Sort.by(dronePage.getSortDirection(), dronePage.getSortBy());
+        // get paged list
+        Pageable pageableDrones = PageRequest.of(dronePage.getPageNumber(), dronePage.getPageSize(), dronesSort);
+        List<Drone> allDbDrones = droneRepository.findAll();
+        if(!allDbDrones.isEmpty()){
+            return new PageImpl<>(
+                    allDbDrones.stream()
+                    .filter(drone -> drone.getState()
+                            .equals(DroneState.IDLE))
+                    .collect(Collectors.toList()), pageableDrones, allDbDrones.size());
+        } else {
+            return new PageImpl<>(new ArrayList<>());
         }
     }
 
