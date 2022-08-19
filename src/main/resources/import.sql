@@ -1,9 +1,9 @@
 INSERT INTO DRONE VALUES ('drone1', 75,'Lightweight',  'IDLE', 75.0); // <=100
-INSERT INTO Drone VALUES ('drone2', 96,'Lightweight',  'LOADING', 100.0);
-INSERT INTO Drone VALUES ('drone3', 45,'Middleweight',  'LOADED', 200.0); // <=250
-INSERT INTO Drone VALUES ('drone4', 60,'Middleweight',  'DELIVERING', 250.0);
-INSERT INTO Drone VALUES ('drone5', 87, 'Cruiserweight', 'DELIVERED', 295.0); // <=350
-INSERT INTO Drone VALUES ('drone6', 100,'Cruiserweight',  'RETURNING', 350.0);
+INSERT INTO Drone VALUES ('drone2', 96,'Lightweight',  'IDLE', 100.0);
+INSERT INTO Drone VALUES ('drone3', 45,'Middleweight',  'IDLE', 200.0); // <=250
+INSERT INTO Drone VALUES ('drone4', 60,'Middleweight',  'IDLE', 250.0);
+INSERT INTO Drone VALUES ('drone5', 87, 'Cruiserweight', 'IDLE', 295.0); // <=350
+INSERT INTO Drone VALUES ('drone6', 100,'Cruiserweight',  'IDLE', 350.0);
 INSERT INTO Drone VALUES ('drone7',10, 'Cruiserweight',  'IDLE', 350.0);
 INSERT INTO Drone VALUES ('drone8',  24,'Heavyweight', 'IDLE', 400.0); // <= 500
 INSERT INTO Drone VALUES ('drone9', 33,'Heavyweight',  'IDLE', 450.0);
