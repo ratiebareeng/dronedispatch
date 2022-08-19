@@ -29,5 +29,21 @@ public class DroneService {
 
     }
 
+    // delete drone
+    public Drone deleteDrone(String serialNumber) {
+        // ensure drone is already registered
+        Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(serialNumber);
+        if(!databaseDrone.isPresent()) {
+            throw new IllegalStateException("Drone with Serial Number: " + serialNumber + " does not exist.");
+        } else {
+            try {
+                droneRepository.delete(databaseDrone.get());
+                return databaseDrone.get();
+            } catch (Exception e) {
+                throw new IllegalStateException(e.getMessage());
+            }
+        }
+
+    }
 
 }
