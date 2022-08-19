@@ -2,6 +2,7 @@ package com.oratilebareeng.dronesdispatch.controller;
 
 import com.oratilebareeng.dronesdispatch.model.Drone;
 import com.oratilebareeng.dronesdispatch.model.DronePage;
+import com.oratilebareeng.dronesdispatch.model.DroneState;
 import com.oratilebareeng.dronesdispatch.model.Medication;
 import com.oratilebareeng.dronesdispatch.service.DroneService;
 import lombok.RequiredArgsConstructor;
@@ -69,8 +70,9 @@ public class DroneController {
             @PathVariable("serialNumber") String serialNumber,
             @RequestParam(required = false) Integer batteryCapacity,
             @RequestParam(required = false) String droneState){
+
         try {
-            droneService.updateDrone(serialNumber, batteryCapacity, droneState);
+            droneService.updateDrone(serialNumber, batteryCapacity, DroneState.valueOf(droneState));
             return new ResponseEntity<>(
                     serialNumber + " updated.",
                     HttpStatus.OK

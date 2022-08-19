@@ -66,13 +66,13 @@ public class DroneService {
     // update drone
     @Transactional
     public void updateDrone(String serialNumber,
-                            Integer batteryCapacity, String droneState){
+                            Integer batteryCapacity, DroneState droneState){
         // check if student exists
         Drone databaseDrone = droneRepository.findBySerialNumber(serialNumber)
                 .orElseThrow(()-> new IllegalStateException("Drone with Serial Number: "
                         + serialNumber + " does not exist"));
 
-        if(batteryCapacity == null && (droneState == null || droneState.isEmpty())){
+        if(batteryCapacity == null && droneState == null){
             throw new IllegalStateException("Please provide new details to update " + serialNumber);
         }
 
@@ -87,10 +87,10 @@ public class DroneService {
 
 
         // vaidate drone state not null, not empty, not same
-        if(droneState != null && !droneState.isEmpty()
+        if(droneState != null
                 && !Objects.equals(droneState, databaseDrone.getState())
         ){
-                databaseDrone.setState(DroneState.valueOf(droneState.toUpperCase()));
+                databaseDrone.setState(droneState);
         }
     }
 
@@ -116,7 +116,7 @@ public class DroneService {
 
                 drone.get().loadMedication(medication);
                 // update drone state
-                updateDrone(serialNumber, null, DroneState.LOADING.name());
+                updateDrone(serialNumber, null, DroneState.LOADING);
                 droneRepository.save(drone.get());
                 return medication.getName() + " has been loaded onto " + serialNumber;
             }
