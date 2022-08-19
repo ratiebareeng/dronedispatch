@@ -101,6 +101,9 @@ public class DroneService {
         Optional<Drone> drone = droneRepository.findBySerialNumber(serialNumber);
         if(drone.isPresent()) {
             double availableSpace = drone.get().getWeight() - drone.get().getLoadedCapacity();
+            if(availableSpace < 0) {
+                availableSpace = 0;
+            }
             // prevent load drone if medication weight is more than available capacity
             if (!(availableSpace >= medication.getWeight())) {
                return  "Not enough space in drone. Available space: " + availableSpace + "g";

@@ -3,6 +3,8 @@ package com.oratilebareeng.dronesdispatch.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Table
 @Entity
@@ -18,5 +20,7 @@ public class Medication {
     private String name;
     private String image; // todo: implement image upload, update
     private int weight;
+    @ManyToMany( mappedBy = "loadedMedication")
+    private List<Drone> dronesLoadedOn = new ArrayList<>();
 
 }

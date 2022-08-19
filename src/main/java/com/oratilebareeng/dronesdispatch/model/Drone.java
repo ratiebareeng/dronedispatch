@@ -1,5 +1,6 @@
 package com.oratilebareeng.dronesdispatch.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,12 +28,13 @@ public class Drone {
     private int loadedCapacity = 0;
     @Enumerated(EnumType.STRING)
     private DroneState state;
-    @OneToMany
-            (
-            cascade = CascadeType.ALL,
-            orphanRemoval = true
+    @ManyToMany
+    @JsonBackReference
+    @JoinTable(
+            name = "loadedMedication",
+            joinColumns = @JoinColumn(name = "serialNumber"),
+            inverseJoinColumns = @JoinColumn(name = "code")
     )
-    @JoinColumn(name = "drone_serial_number")
     private List<Medication> loadedMedication = new ArrayList<>();
 
 
