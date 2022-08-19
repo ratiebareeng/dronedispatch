@@ -4,6 +4,8 @@ import com.oratilebareeng.dronesdispatch.model.*;
 import com.oratilebareeng.dronesdispatch.repository.DroneRepository;
 import com.oratilebareeng.dronesdispatch.repository.MedicationRepository;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,7 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DroneService {
     private final DroneRepository droneRepository;
-    private final MedicationRepository medicationRepository;
+    private Logger logger = LoggerFactory.getLogger(DroneService.class);
 
     // list all drones
     public Page<Drone> getDrones(DronePage dronePage) {
@@ -163,6 +165,16 @@ public class DroneService {
             return "Drone with Serial Number: " + droneSerialNumber+"  does not exist";
         }
 
+    }
+
+    // log drones battery level
+    public void logBatteryLevel(){
+        List<Drone> allDrones = droneRepository.findAll();
+        for (Drone drone : allDrones
+             ) {
+            logger.info(drone.getSerialNumber()
+                    + " battery level is: " + drone.getBatteryCapacity() + "%");
+        }
     }
 
 }
