@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DroneService {
     private final DroneRepository droneRepository;
+    private final MedicationRepository medicationRepository;
     private Logger logger = LoggerFactory.getLogger(DroneService.class);
     final int minimumLoadBatteryCapacity = 25;
 
@@ -33,35 +34,28 @@ public class DroneService {
     }
 
     // register drone
-    public Drone registerDrone(Drone drone) {
+    public String registerDrone(Drone drone) {
         // ensure drone is not already registered
         Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(drone.getSerialNumber());
         if(databaseDrone.isPresent()) {
-            throw new IllegalStateException("Drone with Serial Number: " + drone.getSerialNumber()+ " exists. Serial Number must be unique.");
+            // make sure drone serial number is unique
+            throw new IllegalStateException("Drone with Serial Number: " + drone.getSerialNumber()+ " exists.\nSerial Number must be unique.");
         } else {
-            try {
-                droneRepository.save(drone);
-                return drone;
-            } catch (Exception e) {
-                throw new IllegalStateException(e.getMessage());
-            }
+            droneRepository.save(drone);
+            return drone.getSerialNumber() + " has been registered";
         }
 
     }
 
     // delete drone
-    public Drone deleteDrone(String serialNumber) {
+    public String deleteDrone(String serialNumber) {
         // ensure drone is already registered
         Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(serialNumber);
         if(!databaseDrone.isPresent()) {
             throw new IllegalStateException("Drone with Serial Number: " + serialNumber + " does not exist.");
         } else {
-            try {
-                droneRepository.delete(databaseDrone.get());
-                return databaseDrone.get();
-            } catch (Exception e) {
-                throw new IllegalStateException(e.getMessage());
-            }
+            droneRepository.delete(databaseDrone.get());
+            return databaseDrone.get().getSerialNumber() + " has been deleted";
         }
     }
 
@@ -75,7 +69,7 @@ public class DroneService {
                         + serialNumber + " does not exist"));
 
         if(batteryCapacity == null && droneState == null){
-            throw new IllegalStateException("Please provide new details to update " + serialNumber);
+            throw new IllegalArgumentException("Please provide new details to update " + serialNumber);
         }
 
         // validate battery capacity is within allowed range 0-100
@@ -105,38 +99,42 @@ public class DroneService {
                 availableSpace = 0;
             }
             // prevent load drone if medication weight is more than available capacity
-            if (!(availableSpace >= medication.getWeight())) {
-               return  "Not enough space in drone. Available space: " + availableSpace + "g";
+            if (availableSpace < medication.getWeight() || drone.get().getWeight() < medication.getWeight()) {
+               throw new IllegalStateException("Not enough space in drone.\nAvailable space: " + availableSpace + "g");
             } else if (drone.get().getBatteryCapacity() < minimumLoadBatteryCapacity){
                 // prevent load drone if battery capacity is below minimumLoadBatteryCapacity
-                return "Medication not loaded. "
+                throw new IllegalStateException("Medication not loaded because "
                         + serialNumber
                         + " battery level: "
                         + drone.get().getBatteryCapacity()
-                        + " is below 25%"
-                        + "\nPlease charge drone before loading";
+                        + "% is below 25%"
+                        + "\nPlease charge drone before loading");
 
-            } else if(drone.get().getLoadedMedication().contains(medication)) {
+            } else if(drone.get().getLoadedMedication().contains(medication)
+                    || drone.get().getLoadedMedication().stream().anyMatch(
+                    med -> med.getCode().equals(medication.getCode())
+            )) {
                 // ensure duplicate medication is not loaded
-                return medication.getName()
+                throw new IllegalStateException(medication.getName()
                         + " with code "
                         + medication.getCode()
                         + " is already loaded onto "
-                        + serialNumber;
+                        + serialNumber);
             } else if(!drone.get().getState().equals(DroneState.IDLE)
             && !drone.get().getState().equals(DroneState.LOADING)) {
                 // ensure only IDLE and LOADING state drones can load medication
-                return serialNumber
-                + " is currently "
-                        + drone.get().getState();
-            } else if(drone.get().getLoadedCapacity() == drone.get().getWeight()) {
-                // update drone is fully loaded
-                updateDrone(serialNumber,null , DroneState.LOADED);
-            }
-            else {
+                throw new IllegalStateException(serialNumber
+                        + " is currently "
+                        + drone.get().getState());
+            } else {
                 drone.get().loadMedication(medication);
                 // update drone state
                 updateDrone(serialNumber, null, DroneState.LOADING);
+
+                // update drone is fully loaded
+                if(drone.get().getLoadedCapacity() == drone.get().getWeight()) {
+                    updateDrone(serialNumber,null , DroneState.LOADED);
+                }
                 droneRepository.save(drone.get());
                 return medication.getName() + " has been loaded onto " + serialNumber;
             }
