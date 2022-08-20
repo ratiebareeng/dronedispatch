@@ -39,25 +39,24 @@ public class ApplicationSecurityConfig {
                 .authenticated()
                 .and()
                 .httpBasic();
-                //.formLogin();
-
+        http.headers().frameOptions().disable();
         return http.build();
     }
 
 
     protected UserDetailsService userDetailsService() {
-      UserDetails userRatie = User.builder()
-                .username("ratie")
-                .password(passwordEncoder.encode("password"))
+      UserDetails userAdmin = User.builder()
+                .username("admin")
+                .password(passwordEncoder.encode("adminpass"))
                 .roles(ApplicationUserRole.ADMIN.name())
                 .build();
         UserDetails userTester = User.builder()
-                .username("tester 1")
+                .username("tester")
                 .password(passwordEncoder.encode("testerpass"))
                 .roles(ApplicationUserRole.USER.name())
                 .build();
         return new InMemoryUserDetailsManager(
-                userRatie,
+                userAdmin,
                 userTester
         );
     }
