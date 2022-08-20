@@ -11,6 +11,5 @@ import java.util.Optional;
 public interface DroneRepository extends JpaRepository<Drone, Long> {
 
     // find drone by serial number
-    @Query("SELECT d FROM Drone d WHERE d.serialNumber = ?1")
     Optional<Drone> findBySerialNumber(String serialNumber);
 }
