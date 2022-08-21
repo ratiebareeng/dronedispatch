@@ -21,6 +21,7 @@ public class Medication {
     @Id
     @NotNull
     @NotBlank
+    // validate code input
     @Pattern(regexp = "^[A-Z0-9_]+$", message = "Only Uppercase letters, numbers, \'_\' allowed")
     private String code;
     @NotNull
