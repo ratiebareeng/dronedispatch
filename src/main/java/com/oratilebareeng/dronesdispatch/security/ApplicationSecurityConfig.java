@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
@@ -35,6 +36,10 @@ public class ApplicationSecurityConfig {
         http.cors().and().csrf().disable()
                 .authorizeRequests()
                 .antMatchers("/ ", "index", "/css/*", "/js/*").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/**").hasAnyRole(ApplicationUserRole.USER.name(), ApplicationUserRole.ADMIN.name())
+                .antMatchers(HttpMethod.POST, "/api/**").hasRole(ApplicationUserRole.ADMIN.name())
+                .antMatchers(HttpMethod.DELETE, "/api/**").hasRole(ApplicationUserRole.ADMIN.name())
+                .antMatchers(HttpMethod.PUT, "/api/**").hasRole(ApplicationUserRole.ADMIN.name())
                 .anyRequest()
                 .authenticated()
                 .and()
@@ -51,8 +56,8 @@ public class ApplicationSecurityConfig {
                 .roles(ApplicationUserRole.ADMIN.name())
                 .build();
         UserDetails userTester = User.builder()
-                .username("tester")
-                .password(passwordEncoder.encode("testerpass"))
+                .username("user")
+                .password(passwordEncoder.encode("userpass"))
                 .roles(ApplicationUserRole.USER.name())
                 .build();
         return new InMemoryUserDetailsManager(
