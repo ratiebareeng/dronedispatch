@@ -161,6 +161,7 @@ public class DroneService {
         Pageable pageableDrones = PageRequest.of(dronePage.getPageNumber(), dronePage.getPageSize(), dronesSort);
         List<Drone> allDbDrones = droneRepository.findAll();
         if(!allDbDrones.isEmpty()){
+            // filter get only idle drones
             return new PageImpl<>(
                     allDbDrones.stream()
                     .filter(drone -> drone.getState()
