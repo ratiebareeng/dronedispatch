@@ -1,5 +1,8 @@
 package com.oratilebareeng.dronesdispatch.service;
 
+import com.oratilebareeng.dronesdispatch.exception.ObjectExistsException;
+import com.oratilebareeng.dronesdispatch.exception.ObjectNotFoundException;
+import com.oratilebareeng.dronesdispatch.exception.ValidationException;
 import com.oratilebareeng.dronesdispatch.model.*;
 import com.oratilebareeng.dronesdispatch.repository.DroneRepository;
 import com.oratilebareeng.dronesdispatch.repository.MedicationRepository;
@@ -39,7 +42,7 @@ public class DroneService {
         Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(drone.getSerialNumber());
         if(databaseDrone.isPresent()) {
             // make sure drone serial number is unique
-            throw new IllegalStateException("Drone with Serial Number: " + drone.getSerialNumber()+ " exists.\nSerial Number must be unique.");
+            throw new ObjectExistsException("Drone with Serial Number: " + drone.getSerialNumber()+ " exists.\nSerial Number must be unique.");
         } else {
             droneRepository.save(drone);
             return drone.getSerialNumber() + " has been registered";
@@ -52,7 +55,7 @@ public class DroneService {
         // ensure drone is already registered
         Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(serialNumber);
         if(!databaseDrone.isPresent()) {
-            throw new IllegalStateException("Drone with Serial Number: " + serialNumber + " does not exist.");
+            throw new ObjectNotFoundException("Drone with Serial Number: " + serialNumber + " does not exist.");
         } else {
             droneRepository.delete(databaseDrone.get());
             return databaseDrone.get().getSerialNumber() + " has been deleted";
@@ -62,21 +65,21 @@ public class DroneService {
     // update drone
     @Transactional
     public void updateDrone(String serialNumber,
-                            Integer batteryCapacity, DroneState droneState){
+                            Integer batteryCapacity, DroneState droneState) throws ObjectNotFoundException {
         // check if student exists
         Drone databaseDrone = droneRepository.findBySerialNumber(serialNumber)
-                .orElseThrow(()-> new IllegalStateException("Drone with Serial Number: "
+                .orElseThrow(()-> new ObjectNotFoundException("Drone with Serial Number: "
                         + serialNumber + " does not exist"));
 
         if(batteryCapacity == null && droneState == null){
-            throw new IllegalArgumentException("Please provide new details to update " + serialNumber);
+            throw new ValidationException("Please provide new details to update " + serialNumber);
         }
 
         // validate battery capacity is within allowed range 0-100
         // and is not the same as student name in db
         if(batteryCapacity != null && batteryCapacity != databaseDrone.getBatteryCapacity()){
             if(batteryCapacity < 0 || batteryCapacity > 100) {
-                throw new IllegalStateException("Battery capacity must be between 0 and 100");
+                throw new ValidationException("Battery capacity must be between 0 and 100");
             }
             databaseDrone.setBatteryCapacity(batteryCapacity);
         }
@@ -91,7 +94,7 @@ public class DroneService {
     }
 
     // load drone with medication
-    public String loadDroneWithMedication(Medication medication, String serialNumber){
+    public String loadDroneWithMedication(Medication medication, String serialNumber) throws ObjectNotFoundException {
         Optional<Drone> drone = droneRepository.findBySerialNumber(serialNumber);
         if(drone.isPresent()) {
             double availableSpace = drone.get().getWeight() - drone.get().getLoadedCapacity();
@@ -115,7 +118,7 @@ public class DroneService {
                     med -> med.getCode().equals(medication.getCode())
             )) {
                 // ensure duplicate medication is not loaded
-                throw new IllegalStateException(medication.getName()
+                throw new ObjectExistsException(medication.getName()
                         + " with code "
                         + medication.getCode()
                         + " is already loaded onto "
@@ -143,13 +146,13 @@ public class DroneService {
     }
 
     // get medication loaded onto drone
-    public List<Medication> getLoadedMedication(String droneSerialNumber){
+    public List<Medication> getLoadedMedication(String droneSerialNumber) throws ObjectNotFoundException {
         // ensure drone exists
         Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(droneSerialNumber);
         if(databaseDrone.isPresent()) {
             return databaseDrone.get().getLoadedMedication();
         } else {
-            throw new IllegalStateException("Drone with Serial Number: " + droneSerialNumber+"  does not exist");
+            throw new ObjectNotFoundException("Drone with Serial Number: " + droneSerialNumber+"  does not exist");
         }
     }
 
@@ -173,14 +176,14 @@ public class DroneService {
     }
 
     // get drone battery level
-    public String getDroneBatteryLevel(String droneSerialNumber) {
+    public String getDroneBatteryLevel(String droneSerialNumber) throws ObjectNotFoundException {
         // ensure drone exists
         Optional<Drone> databaseDrone = droneRepository.findBySerialNumber(droneSerialNumber);
         if(databaseDrone.isPresent()) {
             return databaseDrone.get().getSerialNumber()
             + " battery level is: " + databaseDrone.get().getBatteryCapacity() + "%";
         }else {
-            return "Drone with Serial Number: " + droneSerialNumber+"  does not exist";
+            throw new ObjectNotFoundException( "Drone with Serial Number: " + droneSerialNumber+"  does not exist");
         }
 
     }
