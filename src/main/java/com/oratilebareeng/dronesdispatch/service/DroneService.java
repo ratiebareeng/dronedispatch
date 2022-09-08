@@ -103,10 +103,10 @@ public class DroneService {
             }
             // prevent load drone if medication weight is more than available capacity
             if (availableSpace < medication.getWeight() || drone.get().getWeight() < medication.getWeight()) {
-               throw new IllegalStateException("Not enough space in drone.\nAvailable space: " + availableSpace + "g");
+               throw new ValidationException("Not enough space in drone.\nAvailable space: " + availableSpace + "g");
             } else if (drone.get().getBatteryCapacity() < minimumLoadBatteryCapacity){
                 // prevent load drone if battery capacity is below minimumLoadBatteryCapacity
-                throw new IllegalStateException("Medication not loaded because "
+                throw new ValidationException("Medication not loaded because "
                         + serialNumber
                         + " battery level: "
                         + drone.get().getBatteryCapacity()
@@ -126,7 +126,7 @@ public class DroneService {
             } else if(!drone.get().getState().equals(DroneState.IDLE)
             && !drone.get().getState().equals(DroneState.LOADING)) {
                 // ensure only IDLE and LOADING state drones can load medication
-                throw new IllegalStateException(serialNumber
+                throw new ValidationException(serialNumber
                         + " is currently "
                         + drone.get().getState());
             } else {
