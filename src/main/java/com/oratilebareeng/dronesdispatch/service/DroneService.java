@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class DroneService {
     private final DroneRepository droneRepository;
     private final MedicationRepository medicationRepository;
-    private Logger logger = LoggerFactory.getLogger(DroneService.class);
+    private final Logger logger = LoggerFactory.getLogger(DroneService.class);
     final int minimumLoadBatteryCapacity = 25;
 
     // list all drones

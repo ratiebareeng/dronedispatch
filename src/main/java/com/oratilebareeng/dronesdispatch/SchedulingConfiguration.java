@@ -13,8 +13,8 @@ public class SchedulingConfiguration {
     private final DroneService droneService;
 
     // log drone battery level every 30 seconds
-    @Scheduled(fixedRate = 30000)
+    /*@Scheduled(fixedRate = 30000)
     void logDroneBatteryLevels(){
         droneService.logBatteryLevel();
-    }
+    }*/
 }

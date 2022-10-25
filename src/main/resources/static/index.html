@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.thymeleaf.org ">
+<head>
+    <meta charset="UTF-8">
+    <title>Drone Dispatch</title>
+    <h1>Dumela Drone Dispatch</h1>
+
+    <div>
+        <h3>User Endpoints</h3>
+        <p>User has read only access</p>
+        <ul>
+            <li><a href="http://localhost:8080/api/v1/drones-dispatch/drones" target="_blank">List All Drones</a></li>
+            <li><a href="http://localhost:8080/api/v1/drones-dispatch/availableDrones" target="_blank">Available Drones</a></li>
+            <li><a href="http://localhost:8080/api/v1/drones-dispatch/batteryLevel/d{serialNumber}" target="_blank">Drone Battery Level</a></li>
+            <li><a href="http://localhost:8080/api/v1/drones-dispatch/loadedMedication/{serialNumber}" target="_blank">Get Drone Loaded Medication</a></li>
+
+        </ul>
+    </div>
+    <div th:each="item : ${items}">
+        <a th:href="@{/pathvars/single/{id}(id = ${item.id})}">
+            <span th:text="${item.name}"></span>
+        </a>
+    </div>
+</head>
+<body>
+
+</body>
+</html>
